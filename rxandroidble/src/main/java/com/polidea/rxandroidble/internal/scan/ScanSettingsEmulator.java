@@ -8,6 +8,7 @@ import com.polidea.rxandroidble.ClientComponent;
 import com.polidea.rxandroidble.internal.RxBleLog;
 import com.polidea.rxandroidble.scan.ScanCallbackType;
 import com.polidea.rxandroidble.scan.ScanSettings;
+import com.polidea.rxandroidble.RxBleOptions;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -22,6 +23,8 @@ public class ScanSettingsEmulator {
     private final Scheduler scheduler;
     private Observable.Transformer<RxBleInternalScanResult, RxBleInternalScanResult> emulateFirstMatch;
 
+    private int devLostTimeoutMs = RxBleOptions.getDeviceLostTimeoutMs();
+
     @Inject
     public ScanSettingsEmulator(@Named(ClientComponent.NamedSchedulers.COMPUTATION) final Scheduler scheduler) {
         this.scheduler = scheduler;
@@ -29,7 +32,7 @@ public class ScanSettingsEmulator {
         this.emulateFirstMatch = new Observable.Transformer<RxBleInternalScanResult, RxBleInternalScanResult>() {
 
             private Func1<RxBleInternalScanResult, RxBleInternalScanResult> toFirstMatchFunc = toFirstMatch();
-            private final Observable<Long> timerObservable = Observable.timer(10L, TimeUnit.SECONDS, scheduler);
+            private final Observable<Long> timerObservable = Observable.timer(devLostTimeoutMs, TimeUnit.MILLISECONDS, scheduler);
             private final Func1<RxBleInternalScanResult, Observable<?>> emitAfterTimerFunc
                     = new Func1<RxBleInternalScanResult, Observable<?>>() {
                 @Override
@@ -179,7 +182,7 @@ public class ScanSettingsEmulator {
             = new Observable.Transformer<RxBleInternalScanResult, RxBleInternalScanResult>() {
         @Override
         public Observable<RxBleInternalScanResult> call(Observable<RxBleInternalScanResult> observable) {
-            return observable.debounce(10, TimeUnit.SECONDS, scheduler).map(toMatchLost());
+            return observable.debounce(devLostTimeoutMs, TimeUnit.MILLISECONDS, scheduler).map(toMatchLost());
         }
     };
 
