@@ -19,9 +19,7 @@ import com.polidea.rxandroidble.internal.scan.ScanPreconditionsVerifier;
 import com.polidea.rxandroidble.internal.scan.ScanPreconditionsVerifierApi18;
 import com.polidea.rxandroidble.internal.scan.ScanPreconditionsVerifierApi24;
 import com.polidea.rxandroidble.internal.scan.ScanSetupBuilder;
-import com.polidea.rxandroidble.internal.scan.ScanSetupBuilderImplApi18;
 import com.polidea.rxandroidble.internal.scan.ScanSetupBuilderImplApi21;
-import com.polidea.rxandroidble.internal.scan.ScanSetupBuilderImplApi23;
 import com.polidea.rxandroidble.internal.serialization.ClientOperationQueue;
 import com.polidea.rxandroidble.internal.serialization.ClientOperationQueueImpl;
 import com.polidea.rxandroidble.scan.ScanResult;
@@ -208,17 +206,9 @@ public interface ClientComponent {
         @Provides
         @ClientScope
         static ScanSetupBuilder provideScanSetupProvider(
-                @Named(PlatformConstants.INT_DEVICE_SDK) int deviceSdk,
-                Provider<ScanSetupBuilderImplApi18> scanSetupBuilderProviderForApi18,
-                Provider<ScanSetupBuilderImplApi21> scanSetupBuilderProviderForApi21,
-                Provider<ScanSetupBuilderImplApi23> scanSetupBuilderProviderForApi23
+                Provider<ScanSetupBuilderImplApi21> scanSetupBuilderProviderForApi21
         ) {
-            if (deviceSdk < Build.VERSION_CODES.LOLLIPOP) {
-                return scanSetupBuilderProviderForApi18.get();
-            } else if (deviceSdk < Build.VERSION_CODES.M) {
-                return scanSetupBuilderProviderForApi21.get();
-            }
-            return scanSetupBuilderProviderForApi23.get();
+            return scanSetupBuilderProviderForApi21.get();
         }
 
         @Provides
